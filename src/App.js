@@ -49,5 +49,54 @@ function App(){
     }
     carregarPosts();
   }, []);
-  }
 
+  useEffect(()=>{
+    async function verificarlogin(){
+    onAuthStateChanged(auth, (user) =>{
+      if(user){
+        //usuário logado
+        setUser(true)
+        setUserDetail({
+          id: user.id,
+          email: user.email
+        });
+      } else{
+        setUser(false);
+        setUserDetail({});
+      }
+    })                                                                                                    
+    }
+    verificarlogin();
+  }, []);
+  //adicionar o post (create)
+  async function criarPost(){
+    await addDoc(collection(db , "posts"), {
+      titulo: titulo,
+      autor: autor,
+    }).then(()=>{
+      setAutor('')
+      setTitulo('')
+    }).catch((error)=>{
+      console.log("Erro" + error)
+    })
+  }
+  //buscar os posts(read)
+
+  async function buscarPosts(){
+    const listasPost = collection(db, "posts");
+    await getDocs(listasPosts).then((snapshot)=>{
+      let lista =[];
+      console.log(snapshot)
+      snapshot.forEach((doc)=>{
+        lista.push({
+          id: doc.id,
+          titulo: doc.data().titulo,
+          autor: doc.data().autor
+        });
+      });
+      setPosts(lista);
+    }).catch((error)=>{
+      console.log("DEU RUIM! "+ error)
+    })
+  }
+  }
